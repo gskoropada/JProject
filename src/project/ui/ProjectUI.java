@@ -2,12 +2,9 @@
  * Text based interface. 
  * TODO Pending issues:
  * 		- Implement user preferences?
- *		- Check Date Parse Exceptions / 'parseDate' method to return a Date
- *		- Use standard date format for validation
- *		- Flexible printf output for dates
+ * TODO	Check 'add new project' deadline validation
  * 		- Implement DB connectivity 
- * 		- Check DB design / include more data
- * 		- Implement GUI
+ * 		
  */
 
 package project.ui;
@@ -26,7 +23,7 @@ import project.logic.Project;
  * ProjectUI is the text based interface that drives the Project Management application.
  * It uses a Portfolio object to interact with the stored data and modify it.
  * @author Gabriel Skoropada
- * @version	2.0
+ * @version	2.1 - Changed main() to start() on 16/sep/14
  * @see ProjectGUI
  * @see Portfolio
  * @see Project
@@ -71,7 +68,7 @@ public class ProjectUI {
 	/** A String representing the name of the default dataset file */
 	private static final String DEFAULTS_FILE = "defaults.obj";
 
-	public static void main(String args[]) {
+	public static void start() {
 			
 		portfolio.init(WORKING_FILE);
 		

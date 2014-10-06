@@ -53,13 +53,14 @@ import project.logic.*;
  * data set, restore to the default data set and exiting the application.<br>
  * When adding a new project the application prompts for the data using a NewProjectDialog object
  * @author Gabriel Skoropada
- * @version 1.0
+ * @version 1.1 - Changed main() to start(); user settings on 16/sep/14
  * @see ProjectUI
  * @see Portfolio
  * @see Selection
  * @see Project
  * @see OngoingProject
  * @see FinishedProject
+ * @see Settings
  */
 public class ProjectGUI {
 
@@ -70,13 +71,13 @@ public class ProjectGUI {
 	/** Selection object to keep track of which projects have been selected by the user */
 	private static Selection sel = new Selection();
 	/** Default date format String */
-	public static final String DATE_FORMAT="dd/MM/yyyy";
+	private static String DATE_FORMAT;
 	/** SimpleDateFormat object initialized with the default date format */
-	private static SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+	private static SimpleDateFormat dateFormat; 
 	/** String containing the name of the working file */
-	private static final String WORKING_FILE = "portfolio.obj";
-	/** String containing the name of the default dataset file */
-	private static final String DEFAULTS_FILE = "defaults.obj";
+	private static String WORKING_FILE;
+	/** String containing the name of the default data set file */
+	private static String DEFAULTS_FILE;
 	
 	/** JFrame object that acts as the main window of the application */
     private final static JFrame frame = new JFrame("JProject v2.1");
@@ -87,9 +88,16 @@ public class ProjectGUI {
    	/** JLabel object to display the FinishedProject count */
 	private static JLabel finishedProjectsLabel;
 		
-	public static void main (String[] args) {
+	public static void start (Settings s) {
+		
+		WORKING_FILE = s.getWorkingFile();
+		DEFAULTS_FILE = s.getDefaultsFile();
+		DATE_FORMAT = s.getDefaultDateFormat();
+		
 		portfolio.init(WORKING_FILE);
 		sel.init(portfolio);
+		
+		dateFormat = new SimpleDateFormat(DATE_FORMAT);
 		
 		splashScreen();
 		mainWindow();
