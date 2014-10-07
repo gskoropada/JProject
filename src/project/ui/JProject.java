@@ -20,6 +20,8 @@ public class JProject {
 		
 		//s.setGUI(false);
 		
+		//s.setUpdateDB(false);
+		
 		if(s.isGUI()) {
 			ProjectGUI.start(s);
 		} else {

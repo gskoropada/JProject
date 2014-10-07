@@ -2,10 +2,11 @@
 package project.logic;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
-import project.io.ProjectIO;
+import project.io.*;
 import static project.ui.ProjectUI.DATE_FORMAT;
 
 /**
@@ -49,12 +50,37 @@ public class Portfolio {
 	public void init(ArrayList<Project> projects) {
 		portfolio = projects;
 	}
+
+	/**
+	 * Initializes the portfolio working ArrayList&#60;Project&#62; with data from a SQL Server Database
+	 */
+	public void initDB() {
+		try {
+			ProjectDB.connect();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		try {
+			portfolio = ProjectDB.init();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
 	/** Returns the working portfolio as an ArrayList&#60;Project&#62;
-	 * @return	the working portfolio as an ArrayList&#60;Project&#62; */
+	 * @return	the working portfolio as an ArrayList&#60;Project&#62; */	
 	public ArrayList<Project> getPortfolio() {
 	
 		return portfolio;
 	}
+	
+	
 	
 	/** Returns an ArrayList containing all the OngoingProjects in the portfolio 
 	 * @return an Arraylist containing all the OngoingProjects in the portfolio */ 

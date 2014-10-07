@@ -94,7 +94,12 @@ public class ProjectGUI {
 		DEFAULTS_FILE = s.getDefaultsFile();
 		DATE_FORMAT = s.getDefaultDateFormat();
 		
-		portfolio.init(WORKING_FILE);
+		if(s.isUpdateDB()) {
+			portfolio.initDB();
+		} else {
+			portfolio.init(WORKING_FILE);
+		}
+			
 		sel.init(portfolio);
 		
 		dateFormat = new SimpleDateFormat(DATE_FORMAT);
