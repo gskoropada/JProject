@@ -16,7 +16,7 @@ import static project.ui.ProjectUI.DATE_FORMAT;
  * Also includes methods to initialize the collection from a file or from an ArrayList&#60;Project&#62;
  * and to save the collection to a file.
  * @author Gabriel Skoropada
- * @version 2.0
+ * @version 2.1 - Added DB functionality
  */
 public class Portfolio {
 
@@ -113,13 +113,22 @@ public class Portfolio {
 	}
 	
 	/** Adds a Project object to the working ArrayList&#60;Project&#62;
-	 * @param p	Project object to be added to the working ArrayList */
-	public void add (Project p) {
+	 * @param p	Project object to be added to the working ArrayList 
+	 * @param db Boolean value indicating if the database must be updated.
+	 */
+	public void add (Project p, boolean db) {
 		
 		if (p instanceof OngoingProject) {
 			portfolio.add((OngoingProject)p);
+			if(db) {
+				ProjectDB.add((OngoingProject)p);
+			}
+			
 		} else if (p instanceof FinishedProject) {
 			portfolio.add((FinishedProject) p);
+			if(db) {
+				ProjectDB.add((FinishedProject)p);
+			}
 		}
 	}
 		
@@ -265,18 +274,32 @@ public class Portfolio {
 	 * Replaces a Project object in the specified index position.
 	 * @param p	New Project object to be included in the ArrayList
 	 * @param index	Integer representing the location in the ArrayList where the new Project object should be placed
+	 * @param db Boolean value indicating if the database must be updated.
 	 */
-	public void replaceProject(Project p, int index) {
+	public void replaceProject(Project p, int index, boolean db) {
 
+		Project OldP = portfolio.get(index);
+		boolean change = false;
+		if(OldP instanceof OngoingProject && p instanceof FinishedProject) {
+			change = true;
+		} 
 		portfolio.set(index, p);
+		if(db) {
+			ProjectDB.update(p, change);
+		}
 		
 	}
 	/**
 	 * Removes a Project object from the specified position
 	 * @param index	Integer value representing the location in the ArrayList of the Project object to be removed
+	 * @param db Boolean value indicating if the database must be updated.
 	 */
-	public void remove(int index) {
+	public void remove(int index, boolean db) {
 		
+			
+		if(db) {
+			ProjectDB.delete(portfolio.get(index));
+		}
 		portfolio.remove(index);
 		
 	}

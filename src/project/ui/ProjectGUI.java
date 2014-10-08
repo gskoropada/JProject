@@ -68,6 +68,8 @@ public class ProjectGUI {
 	private static boolean saved=true;
 	/** Portfolio object to handle the application data */
 	private static Portfolio portfolio = new Portfolio();
+	/** Settings object holding the values for the different application settings */
+	private static Settings config = new Settings();
 	/** Selection object to keep track of which projects have been selected by the user */
 	private static Selection sel = new Selection();
 	/** Default date format String */
@@ -89,6 +91,8 @@ public class ProjectGUI {
 	private static JLabel finishedProjectsLabel;
 		
 	public static void start (Settings s) {
+		
+		config = s;
 		
 		WORKING_FILE = s.getWorkingFile();
 		DEFAULTS_FILE = s.getDefaultsFile();
@@ -145,7 +149,7 @@ public class ProjectGUI {
 					for(int i=0;i<selected.length;i++) {
 					
 						int index = portfolio.findByCode(selected[i]);
-						portfolio.remove(index);
+						portfolio.remove(index, config.isUpdateDB());
 						sel.remove(index);
 					
 					}
@@ -205,10 +209,10 @@ public class ProjectGUI {
         		    	  int choice = JOptionPane.showConfirmDialog(frame, msg, "Change project status", JOptionPane.YES_NO_OPTION);
         		    	  
         		    	  if(choice == 0) {
-        		    		System.out.println("changed");
         		    		int index = portfolio.findByCode((String)target.getValueAt(row,0));
         		    		Project p = portfolio.get(index);
-        		    		portfolio.replaceProject(new FinishedProject(p), index);
+        		    		System.out.println("** Project "+p.getCode()+" changed **");
+        		    		portfolio.replaceProject(new FinishedProject(p), index, config.isUpdateDB());
         		    		opTable.setModel((TableModel) new ProjectTableModel(portfolio.getOngoingProjects()));
 	      					fpTable.setModel((TableModel) new ProjectTableModel(portfolio.getFinishedProjects()));
 	      					updateCounters();
@@ -335,7 +339,7 @@ public class ProjectGUI {
 	 * Asks the user for confirmation if there are any unsaved changes on exit.
 	 */
 	private static void checkSaveOnExit() {
-		if(!saved) {
+		if(!saved && !config.isUpdateDB()) {
     		int option = JOptionPane.showOptionDialog(frame,
     				"There are unsaved changes\nDo you want to save them now?",
     				"Unsaved changes",JOptionPane.YES_NO_CANCEL_OPTION,
@@ -370,12 +374,14 @@ public class ProjectGUI {
 	 * @param s is a Boolean value indicating what the saved status should be.
 	 */
 	private static void toggleSaved(boolean s) {
-		if(!s) {
-			frame.setTitle("JProject v2.1 ** Unsaved Changes **");
-		} else {
-			frame.setTitle("JProject v2.1");
+		if(!config.isUpdateDB()) {
+			if(!s) {
+				frame.setTitle("JProject v2.1 ** Unsaved Changes **");
+			} else {
+				frame.setTitle("JProject v2.1");
+			}
+			saved = s;
 		}
-		saved = s;
 	}
 	
 	/**
@@ -545,7 +551,7 @@ public class ProjectGUI {
 					if(validateForm()) {
 						
 						Project prj = compileProject();
-						portfolio.add(prj);
+						portfolio.add(prj,config.isUpdateDB());
 						if(prj instanceof OngoingProject) {
 							ProjectTableModel tm = (ProjectTableModel) opTable.getModel();
 							tm.addRow(prj.toTable());
@@ -932,7 +938,7 @@ public class ProjectGUI {
 				return;
 			}
 			
-			portfolio.replaceProject(p, index);
+			portfolio.replaceProject(p, index, config.isUpdateDB());
 			toggleSaved(false);
 		}
 		
