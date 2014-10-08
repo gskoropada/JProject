@@ -8,6 +8,8 @@ import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -27,6 +29,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -119,7 +122,7 @@ public class ProjectGUI {
 	public static void mainWindow() {
 		
 		//Create and set up the window.
-		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setPreferredSize(new Dimension(1024,600));
         
         JLabel topLabel = new JLabel("JProject v.2.1");
@@ -270,16 +273,25 @@ public class ProjectGUI {
         	JButton btnQuit = new JButton("Quit");
         	btnQuit.addActionListener(new ActionListener(){
         	    /* Checks if there are unsaved changes and asks the user if he/she would like to save the data */
-        		public void actionPerformed(ActionEvent e)
-        	    {
+        		public void actionPerformed(ActionEvent e) {
         	    	checkSaveOnExit();
         	    }
+        	});
+        	
+        	JButton btnSet = new JButton("Settings");
+        	btnSet.addActionListener(new ActionListener() {
+        		/* Opens the change settings dialog */
+				public void actionPerformed(ActionEvent e) {
+					changeSettings();
+				}
+        		
         	});
         	
         	menuOptions.add(btnAdd);
         	menuOptions.add(btnDel);
         	menuOptions.add(btnSave);
         	menuOptions.add(btnRestore);
+        	menuOptions.add(btnSet);
         	menuOptions.add(btnQuit);
         
         frame.add(topLabel, BorderLayout.PAGE_START);
@@ -335,6 +347,100 @@ public class ProjectGUI {
 	    frame.pack();
 	    frame.setVisible(true);
 	}
+	
+	/**
+	 * Displays the Change Settings dialog.
+	 */
+	private static void changeSettings() {
+		
+		final Settings sett = config;
+		
+		final JFrame settingsDialog = new JFrame("Change settings");
+		
+		settingsDialog.getContentPane().setLayout(new BorderLayout());
+		settingsDialog.setPreferredSize(new Dimension(350,150));
+		
+		JPanel settings = new JPanel();
+		settings.setLayout(new GridLayout(3,2));
+		
+		JLabel lblDB = new JLabel("Update DB dynamically");
+		JRadioButton rbDB = new JRadioButton();
+		rbDB.setSelected(sett.isUpdateDB());
+		rbDB.addItemListener(new ItemListener(){
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if(e.getStateChange() == ItemEvent.SELECTED){
+					sett.setUpdateDB(true);
+				} else if(e.getStateChange() == ItemEvent.DESELECTED){
+					sett.setUpdateDB(false);
+				}
+				System.out.println("DB: "+sett.isUpdateDB());
+			}
+			
+		});		
+		JLabel lblGUI = new JLabel("Use Graphical User Interface");
+		JRadioButton rbGUI = new JRadioButton();
+		rbGUI.setSelected(sett.isGUI());
+		rbGUI.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if(e.getStateChange() == ItemEvent.SELECTED){
+					sett.setGUI(true);
+				} else if(e.getStateChange() == ItemEvent.DESELECTED){
+					sett.setGUI(false);
+				}
+				System.out.println("GUI: "+sett.isGUI());
+			}			
+		});
+		
+		JLabel lblFile = new JLabel("Working file");
+		final JTextField tfFile = new JTextField(sett.getWorkingFile());
+				
+		settings.add(lblDB);
+		settings.add(rbDB);
+		settings.add(lblGUI);
+		settings.add(rbGUI);
+		settings.add(lblFile);
+		settings.add(tfFile);
+		
+		JButton btnSave = new JButton("Save settings");
+		btnSave.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				sett.setWorkingFile(tfFile.getText());
+				
+				sett.save();
+				config = sett;
+				settingsDialog.dispose();
+				
+				if(!sett.isGUI()){
+					frame.dispose();
+					ProjectUI.start(sett);
+				}
+				
+				if(!sett.isUpdateDB()){
+					portfolio.init(config.getWorkingFile());
+				} else {
+					portfolio.initDB();
+				}
+					opTable.setModel((TableModel) new ProjectTableModel(portfolio.getOngoingProjects()));
+					fpTable.setModel((TableModel) new ProjectTableModel(portfolio.getFinishedProjects()));
+					sel.init(portfolio);
+					updateCounters();
+			}
+		});
+		
+		settingsDialog.add(settings, BorderLayout.CENTER);
+		settingsDialog.add(btnSave, BorderLayout.PAGE_END);
+		
+		settingsDialog.pack();
+		settingsDialog.setVisible(true);		
+	}
+
 	/**
 	 * Asks the user for confirmation if there are any unsaved changes on exit.
 	 */

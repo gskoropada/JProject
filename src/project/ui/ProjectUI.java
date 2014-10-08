@@ -18,6 +18,7 @@ import project.logic.FinishedProject;
 import project.logic.OngoingProject;
 import project.logic.Portfolio;
 import project.logic.Project;
+import project.logic.Settings;
 
 /**
  * ProjectUI is the text based interface that drives the Project Management application.
@@ -43,6 +44,7 @@ public class ProjectUI {
 	private static int index;
 	/** Working Portfolio object */
 	private static Portfolio portfolio = new Portfolio();
+	private static Settings config = new Settings();
 	/** Project object used across this class to temporarily store Project information*/
 	private static Project p = null;
 	/** Default date format String for this application */
@@ -68,10 +70,15 @@ public class ProjectUI {
 	/** A String representing the name of the default dataset file */
 	private static final String DEFAULTS_FILE = "defaults.obj";
 
-	public static void start() {
-			
-		portfolio.init(WORKING_FILE);
+	public static void start(Settings s) {
 		
+		config = s;
+		
+		if(config.isUpdateDB()) {
+			portfolio.initDB();
+		} else {
+			portfolio.init(WORKING_FILE);
+		}
 		splash();
 		
 		portfolio.listProjects();
@@ -102,9 +109,10 @@ public class ProjectUI {
 				parseProject(p);
 				
 				if(confirm("Add this project?")) {
-					
-					saved = false;
-					portfolio.add(p);
+					if(!config.isUpdateDB()) {
+						saved = false;
+					}
+					portfolio.add(p, config.isUpdateDB());
 				}
 				
 				break;
@@ -119,15 +127,14 @@ public class ProjectUI {
 					if(confirm("Edit this project?")) {
 						
 						p=getExistingProjectData(portfolio.get(index));
-						
-						@SuppressWarnings("unused")
-						boolean check = portfolio.get(index).equals(p);
-						
+		
 						if (!portfolio.get(index).equals(p)) {
 							parseProject(p);
 							if(confirm("Is the new data correct?")) {
-								saved = false;
-								portfolio.replaceProject(p,index);
+								if(!config.isUpdateDB()) {
+									saved = false;
+								}
+								portfolio.replaceProject(p,index,config.isUpdateDB());
 							} 
 						}
 					}
@@ -143,8 +150,10 @@ public class ProjectUI {
 					
 					if(confirm("Delete this project?")) {
 						
-						saved = false;
-						portfolio.remove(index);
+						if(!config.isUpdateDB()) {
+							saved = false;
+						}
+						portfolio.remove(index, config.isUpdateDB());
 					}
 				}
 				

@@ -58,11 +58,18 @@ public class ProjectIO {
 	 * @throws	IOException	when there is any critical error with the file
 	 */
 	public static void saveSettings (Settings s) throws IOException {
+
+		File settFile = new File(SETTINGS_FILE);
 		
-			ObjectOutputStream objOut = new ObjectOutputStream (new FileOutputStream (SETTINGS_FILE));
-			objOut.writeObject (s);
-			objOut.close();
+		if(settFile.exists()) {
+			settFile.delete();
 		}
+		
+		ObjectOutputStream objOut = new ObjectOutputStream (new FileOutputStream (SETTINGS_FILE));
+		objOut.writeObject (s);
+		objOut.close();
+		System.out.println("** Settings saved **");
+	}
 
 	/** 
 	 * Reads the user preferences and defaults from the default settings file
@@ -78,6 +85,8 @@ public class ProjectIO {
 		s = (Settings) objIn.readObject();
 		objIn.close ();
 	
+		System.out.println(s.toString());
+		
 		return s;
 	}
 	

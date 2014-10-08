@@ -98,7 +98,6 @@ public class Settings implements Serializable {
 	 * Reads the settings from the default file and updates the object's value.
 	 * @return true if read operation was successful
 	 */
-	@SuppressWarnings("unused")
 	public boolean read() {
 		boolean read = false;
 		Settings s = new Settings();
@@ -106,8 +105,16 @@ public class Settings implements Serializable {
 			s = ProjectIO.readSettings();
 			read = true;
 		} catch(Exception e) {
-			
+			e.printStackTrace();
 		}
+		
+		defaultDateFormat = s.getDefaultDateFormat();
+		GUI = s.isGUI();
+		workingFile = s.getWorkingFile();
+		defaultsFile = s.getDefaultsFile();
+		updateDB = s.isUpdateDB();
+		
+		System.out.println("** Settings read **");
 		return read;
 	}
 	/**

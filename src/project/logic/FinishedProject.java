@@ -107,6 +107,8 @@ public class FinishedProject extends Project {
 			if(!p.getStartDate().equals(super.getStartDate())) equal=false;
 			if(!((FinishedProject)p).getEndDate().equals(endDate)) equal=false;
 			if(((FinishedProject)p).getTotalCost() != totalCost) equal=false;
+		} else {
+			equal = false;
 		}
 		
 		return equal;

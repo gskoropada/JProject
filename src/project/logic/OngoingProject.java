@@ -137,6 +137,8 @@ public class OngoingProject extends Project {
 			if(!((OngoingProject)p).getDeadline().equals(deadline)) equal=false;
 			if(((OngoingProject)p).getBudget() != budget) equal=false;
 			if(((OngoingProject)p).getCompletion() != completion) equal=false;
+		} else {
+			equal = false;
 		}
 		
 		return equal;

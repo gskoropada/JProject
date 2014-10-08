@@ -18,14 +18,10 @@ public class JProject {
 		s.read();
 		parseArgs(args);
 		
-		//s.setGUI(false);
-		
-		//s.setUpdateDB(false);
-		
 		if(s.isGUI()) {
 			ProjectGUI.start(s);
 		} else {
-			ProjectUI.start();
+			ProjectUI.start(s);
 		}
 	}
 
@@ -40,13 +36,25 @@ public class JProject {
 				if(args[i].startsWith("g=")) {
 					try {
 						int x = Integer.parseInt(args[i].substring(2));
-						if(x>=0) {
+						if(x==1) {
 							s.setGUI(true);
 						} else {
 							s.setGUI(false);
 						}
 					} catch (Exception e) {
 						System.out.println("invalid value " + args[i].substring(2) + " after g parameter");
+					}
+				}
+				if(args[i].startsWith("d=")) {
+					try {
+						int x = Integer.parseInt(args[i].substring(2));
+						if(x==1) {
+							s.setUpdateDB(true);
+						} else {
+							s.setUpdateDB(false);
+						}
+					} catch (Exception e) {
+						System.out.println("invalid value " + args[i].substring(2) + " after d parameter");
 					}
 				}
 			}
