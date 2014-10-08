@@ -13,7 +13,7 @@ import static project.ui.ProjectUI.DATE_FORMAT;
  * @see OngoingProject
  * @see FinishedProject
  */
-abstract public class Project implements Serializable {
+abstract public class Project implements Serializable, Comparable<Project> {
 	
 	private static final long serialVersionUID = -5164726797294313603L;
 	
@@ -87,6 +87,12 @@ abstract public class Project implements Serializable {
 	 */
 	public void setClient (String Cl) {
 		client = Cl;
+	}
+	
+	@Override
+	public int compareTo(Project p) {
+		
+		return this.getCode().compareToIgnoreCase(p.getCode());
 	}
 	
 	//Getter methods

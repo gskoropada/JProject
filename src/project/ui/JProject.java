@@ -1,6 +1,6 @@
 package project.ui;
 
-import project.logic.Settings;
+import project.logic.*;
 
 /**
  * Point-of-entry class for the JProject application

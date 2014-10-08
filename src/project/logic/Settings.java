@@ -114,7 +114,9 @@ public class Settings implements Serializable {
 		defaultsFile = s.getDefaultsFile();
 		updateDB = s.isUpdateDB();
 		
-		System.out.println("** Settings read **");
+		System.out.println("** Settings read **");		
+		System.out.println(toString());
+
 		return read;
 	}
 	/**

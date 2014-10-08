@@ -61,10 +61,11 @@ public class ProjectUI {
 		"--------------------------",
 		"S. Save current status",
 		"R. Restore to default data set",
+		"T. Change settings",
 		"Q. Quit"};
 	
 	/** A String array containing all the menu options' values */
-	private static final  String[] MENU_VALUE = {"1","2","3","4","S","R","Q"};
+	private static final  String[] MENU_VALUE = {"1","2","3","4","S","R","Q","T"};
 	/** A String representing the name of the working file */
 	private static final String WORKING_FILE = "portfolio.obj";
 	/** A String representing the name of the default dataset file */
@@ -96,6 +97,7 @@ public class ProjectUI {
 			 * 4 = Save
 			 * 5 = Restore
 			 * 6 = Quit
+			 * 7 = Settings
 			 */
 			
 			switch (choice){
@@ -176,12 +178,40 @@ public class ProjectUI {
 				}
 				System.out.println("Good Bye!\n");
 				break;
+			case 7: //Settings
+				changeSettings();
+				
+				if(config.isUpdateDB()) {
+					portfolio.initDB();
+				} else {
+					portfolio.init(config.getWorkingFile());
+				}
+				if(config.isGUI()) {
+					choice = -1;
+				} else {
+					portfolio.listProjects();
+				}
 			}
 			
 		} while (choice != -1);
 		
+		if(config.isGUI()) {
+			ProjectGUI.start(config);
+		}
+		
 	}
-	
+	/**
+	 * Allows user to change settings.
+	 */
+	private static void changeSettings() {
+			
+		config.setGUI(confirm("Use GUI?"));
+		config.setUpdateDB(confirm("Update DB dynamically?"));
+		
+		config.save();
+		
+	}
+
 	/**
 	 * Requests the user for confirmation. Displays a custom message in the following format
 	 * <p><strong>msg + " (Y/N) "</strong></p>
@@ -191,7 +221,6 @@ public class ProjectUI {
 	 */
 	private static boolean confirm(String msg) {
 
-		
 		boolean confirm = false;
 		
 		System.out.print(msg + " (Y/N) ");
@@ -562,7 +591,8 @@ public class ProjectUI {
 	 * Displays the menu options to the user and notifies of any unsaved changes.
 	 */
 	public static void displayMenu () {
-				
+		
+		if (config.isUpdateDB()) System.out.println("** Linked to Database **\n");		
 		if (!saved) System.out.println("\nThere are unsaved changes.\n");
 			
 		for (int x = 0; x < MENU.length ;x++) {

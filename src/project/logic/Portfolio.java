@@ -4,6 +4,7 @@ package project.logic;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import project.io.*;
 import static project.ui.ProjectUI.DATE_FORMAT;
@@ -42,12 +43,15 @@ public class Portfolio {
 		} catch (ClassNotFoundException | IOException e) {
 			System.out.println("** FILE ERROR **\n");
 		}
+		
+		Collections.sort(portfolio);
 	}
 	/** Initializes the portfolio working ArrayList&#60;Project&#62; with data from another
 	* ArrayList&#60;Project&#62;
 	* @param projects	ArrayList&#60;Project&#62; object containing the data */
 	public void init(ArrayList<Project> projects) {
 		portfolio = projects;
+		Collections.sort(portfolio);
 	}
 
 	/**
@@ -57,6 +61,7 @@ public class Portfolio {
 		ProjectDB.connect();
 
 		portfolio = ProjectDB.init();
+		Collections.sort(portfolio);
 		
 	}
 	
@@ -140,14 +145,18 @@ public class Portfolio {
 	* working ArrayList&#60;Project&#62;. Returns -1 if the Code is not found */
 	public int findByCode (String c) {
 		
+		Project p = new OngoingProject();
+		p.setCode(c);	
 		
 		int index = -1;
-		for (int i=0; i<portfolio.size(); i++) {
+		index = Collections.binarySearch(portfolio,p);
+		
+		/*for (int i=0; i<portfolio.size(); i++) {
 			if (portfolio.get(i).getCode().equalsIgnoreCase(c)) {
 				index = i;
 				break;
 			}
-		}
+		}*/
 		
 		return index;
 	}

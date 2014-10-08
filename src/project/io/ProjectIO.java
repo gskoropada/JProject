@@ -84,8 +84,6 @@ public class ProjectIO {
 		Settings s = new Settings();
 		s = (Settings) objIn.readObject();
 		objIn.close ();
-	
-		System.out.println(s.toString());
 		
 		return s;
 	}

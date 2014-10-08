@@ -67,6 +67,7 @@ import project.logic.*;
  */
 public class ProjectGUI {
 
+	private static final String VERSION = "3.0";
 	/** true if there are no unsaved changes, false if changes had been made and not saved */
 	private static boolean saved=true;
 	/** Portfolio object to handle the application data */
@@ -85,7 +86,7 @@ public class ProjectGUI {
 	private static String DEFAULTS_FILE;
 	
 	/** JFrame object that acts as the main window of the application */
-    private final static JFrame frame = new JFrame("JProject v2.1");
+    private final static JFrame frame = new JFrame();
     /** JTable object to display the project information in tabular format */
     private static JTable opTable, fpTable;
     /** JLabel object to display the OngoingProject count */
@@ -124,8 +125,13 @@ public class ProjectGUI {
 		//Create and set up the window.
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setPreferredSize(new Dimension(1024,600));
+        if(config.isUpdateDB()) {
+        	frame.setTitle("JProject v."+VERSION+" ** Linked to Database **");
+        } else {
+        	frame.setTitle("JProject v."+VERSION);
+        }
         
-        JLabel topLabel = new JLabel("JProject v.2.1");
+        JLabel topLabel = new JLabel("JProject v."+VERSION);
         JButton btnAdd = new JButton("Add new project");
         	btnAdd.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -424,13 +430,16 @@ public class ProjectGUI {
 				
 				if(!sett.isUpdateDB()){
 					portfolio.init(config.getWorkingFile());
+					frame.setTitle("JProject v."+VERSION);
 				} else {
 					portfolio.initDB();
+					frame.setTitle("JProject v."+VERSION+" ** Linked to Database **");
 				}
 					opTable.setModel((TableModel) new ProjectTableModel(portfolio.getOngoingProjects()));
 					fpTable.setModel((TableModel) new ProjectTableModel(portfolio.getFinishedProjects()));
 					sel.init(portfolio);
 					updateCounters();
+					
 			}
 		});
 		
@@ -469,9 +478,9 @@ public class ProjectGUI {
 	 */
 	private static void splashScreen() {
 		
-		String message = "Welcome to JProject v2.1\nby Gabriel Skoropada";
+		String message = "Welcome to JProject v"+VERSION+"\nby Gabriel Skoropada";
 		
-		JOptionPane.showMessageDialog(null, message, "JProject v2.1", JOptionPane.NO_OPTION, null);
+		JOptionPane.showMessageDialog(null, message, "JProject v"+VERSION, JOptionPane.NO_OPTION, null);
 		
 	}
 	
@@ -482,9 +491,9 @@ public class ProjectGUI {
 	private static void toggleSaved(boolean s) {
 		if(!config.isUpdateDB()) {
 			if(!s) {
-				frame.setTitle("JProject v2.1 ** Unsaved Changes **");
+				frame.setTitle("JProject v."+VERSION+" ** Unsaved Changes **");
 			} else {
-				frame.setTitle("JProject v2.1");
+				frame.setTitle("JProject v."+VERSION);
 			}
 			saved = s;
 		}
