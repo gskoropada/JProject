@@ -52,6 +52,16 @@ public class ProjectDB {
 		}
 	}
 	
+	public static void close() {
+		try {
+			con.close();
+			System.out.println("** Connection closed **");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	/**
 	 * Reads all the records in the database and returns them as an ArrayList 
 	 * @return An ArrayList&#60;Project&#62; with the data from the DB

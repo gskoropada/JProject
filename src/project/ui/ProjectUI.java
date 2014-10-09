@@ -32,7 +32,7 @@ import project.logic.Settings;
  * @see FinishedProject
  * 
  */
-public class ProjectUI {
+public class ProjectUI extends ProjectAbstractUI {
 	
 	/** Scanner object used to get input from the user */
 	private static Scanner input = new Scanner(System.in);
@@ -71,7 +71,8 @@ public class ProjectUI {
 	/** A String representing the name of the default dataset file */
 	private static final String DEFAULTS_FILE = "defaults.obj";
 
-	public static void start(Settings s) {
+	@Override
+	public boolean start(Settings s) {
 		
 		config = s;
 		
@@ -180,23 +181,28 @@ public class ProjectUI {
 				break;
 			case 7: //Settings
 				changeSettings();
-				
-				if(config.isUpdateDB()) {
-					portfolio.initDB();
-				} else {
-					portfolio.init(config.getWorkingFile());
-				}
 				if(config.isGUI()) {
 					choice = -1;
 				} else {
 					portfolio.listProjects();
+				
+					if(config.isUpdateDB()) {
+						portfolio.initDB();
+					} else {
+						portfolio.init(config.getWorkingFile());
+					}
 				}
+				break;
 			}
 			
 		} while (choice != -1);
 		
+		portfolio.close();
+		
 		if(config.isGUI()) {
-			ProjectGUI.start(config);
+			return false;
+		} else {
+			return true;
 		}
 		
 	}
@@ -259,8 +265,10 @@ public class ProjectUI {
 		
 		String in;
 		boolean exists;
-		do {
-			System.out.print("Project Code: ");
+		newProject.setCode(portfolio.getNewCode());
+		System.out.println("Project Code: "+newProject.getCode());
+		/*do {
+			System.out.println("Project Code: "+portfolio.getNewCode());
 			in = input.nextLine();
 			exists = false;
 			if(portfolio.findByCode(in) == -1) { 
@@ -269,7 +277,7 @@ public class ProjectUI {
 				exists = true;
 				System.out.println("** Project already exists **");
 			}
-		} while (exists);
+		} while (exists);*/
 		
 			System.out.print("Project Name: ");
 			in = input.nextLine();
@@ -843,7 +851,10 @@ public class ProjectUI {
 			code = input.nextLine();
 			if (!code.toUpperCase().equals("Q")) {
 				index = portfolio.findByCode(code);
-				if (index == -1) System.out.println("** Invalid Project Code **");
+				if (index >= 0) {
+					System.out.println("** Invalid Project Code **");
+					index = -1;
+				}
 			} else index = -2;
 			
 		} while (index == -1);

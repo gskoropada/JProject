@@ -59,8 +59,9 @@ public class Portfolio {
 	 */
 	public void initDB() {
 		ProjectDB.connect();
-
+		
 		portfolio = ProjectDB.init();
+	
 		Collections.sort(portfolio);
 		
 	}
@@ -122,6 +123,7 @@ public class Portfolio {
 				ProjectDB.add((FinishedProject)p);
 			}
 		}
+		Collections.sort(portfolio);
 	}
 		
 	/** Returns the Project object at a given index position. 
@@ -148,8 +150,7 @@ public class Portfolio {
 		Project p = new OngoingProject();
 		p.setCode(c);	
 		
-		int index = -1;
-		index = Collections.binarySearch(portfolio,p);
+		int index = Collections.binarySearch(portfolio,p);
 		
 		/*for (int i=0; i<portfolio.size(); i++) {
 			if (portfolio.get(i).getCode().equalsIgnoreCase(c)) {
@@ -297,6 +298,7 @@ public class Portfolio {
 			ProjectDB.delete(portfolio.get(index));
 		}
 		portfolio.remove(index);
+		Collections.sort(portfolio);
 		
 	}
 	
@@ -323,5 +325,16 @@ public class Portfolio {
 		
 	}
 	
+	public void close() {
+		ProjectDB.close();
+	}
+	
+	public String getNewCode() {
+		String lastCode = portfolio.get(portfolio.size()-1).getCode();
+		
+		String newCode = "P"+String.format("%04d", (Integer.parseInt(lastCode.substring(1))+1));
+		
+		return newCode;
+	}
 	
 }

@@ -156,5 +156,6 @@ abstract public class Project implements Serializable, Comparable<Project> {
 	 * @see project.ui.ProjectGUI
 	 */
 	abstract public Object[] toTable();
+
 	
 }

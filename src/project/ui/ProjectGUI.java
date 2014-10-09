@@ -24,6 +24,7 @@ import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -65,7 +66,7 @@ import project.logic.*;
  * @see FinishedProject
  * @see Settings
  */
-public class ProjectGUI {
+public class ProjectGUI extends ProjectAbstractUI {
 
 	private static final String VERSION = "3.0";
 	/** true if there are no unsaved changes, false if changes had been made and not saved */
@@ -86,45 +87,54 @@ public class ProjectGUI {
 	private static String DEFAULTS_FILE;
 	
 	/** JFrame object that acts as the main window of the application */
-    private final static JFrame frame = new JFrame();
+  //  private final static JFrame frame = new JFrame();
+	private final static JDialog frame = new JDialog();
     /** JTable object to display the project information in tabular format */
     private static JTable opTable, fpTable;
     /** JLabel object to display the OngoingProject count */
    	private static JLabel ongoingProjectsLabel;
    	/** JLabel object to display the FinishedProject count */
 	private static JLabel finishedProjectsLabel;
+	
+	private static boolean exit = true;
 		
-	public static void start (Settings s) {
-		
+	public boolean start (Settings s) {
+		exit = true;
 		config = s;
 		
 		WORKING_FILE = s.getWorkingFile();
 		DEFAULTS_FILE = s.getDefaultsFile();
 		DATE_FORMAT = s.getDefaultDateFormat();
 		
+		System.out.println("Settings assigned");
 		if(s.isUpdateDB()) {
+			System.out.println("Update DB");
 			portfolio.initDB();
 		} else {
+			System.out.println("Open File");
 			portfolio.init(WORKING_FILE);
 		}
 			
+		System.out.println("Init selection");
 		sel.init(portfolio);
 		
 		dateFormat = new SimpleDateFormat(DATE_FORMAT);
 		
+		System.out.println("Show splash");
 		splashScreen();
-		mainWindow();
-		
+		System.out.println("Show main window");
+		return mainWindow();
 	}
 	
 	/**
 	 * Displays the main application windows.
 	 */
-	public static void mainWindow() {
+	public static boolean mainWindow() {
 		
 		//Create and set up the window.
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         frame.setPreferredSize(new Dimension(1024,600));
+        frame.setModal(true);
         if(config.isUpdateDB()) {
         	frame.setTitle("JProject v."+VERSION+" ** Linked to Database **");
         } else {
@@ -314,6 +324,7 @@ public class ProjectGUI {
 			/* Checks if there are unsaved changes and asks the user if he/she would like to save the data */
 			@Override
 			public void windowClosing(WindowEvent e) {
+				System.out.println("Window Closing");
 				checkSaveOnExit();
 			}
 
@@ -352,6 +363,8 @@ public class ProjectGUI {
         //Display the window.
 	    frame.pack();
 	    frame.setVisible(true);
+	    
+	    return exit;
 	}
 	
 	/**
@@ -361,7 +374,7 @@ public class ProjectGUI {
 		
 		final Settings sett = config;
 		
-		final JFrame settingsDialog = new JFrame("Change settings");
+		final JDialog settingsDialog = new JDialog(frame, "Change settings");
 		
 		settingsDialog.getContentPane().setLayout(new BorderLayout());
 		settingsDialog.setPreferredSize(new Dimension(350,150));
@@ -381,7 +394,6 @@ public class ProjectGUI {
 				} else if(e.getStateChange() == ItemEvent.DESELECTED){
 					sett.setUpdateDB(false);
 				}
-				System.out.println("DB: "+sett.isUpdateDB());
 			}
 			
 		});		
@@ -397,7 +409,6 @@ public class ProjectGUI {
 				} else if(e.getStateChange() == ItemEvent.DESELECTED){
 					sett.setGUI(false);
 				}
-				System.out.println("GUI: "+sett.isGUI());
 			}			
 		});
 		
@@ -425,7 +436,7 @@ public class ProjectGUI {
 				
 				if(!sett.isGUI()){
 					frame.dispose();
-					ProjectUI.start(sett);
+					exit = false;
 				}
 				
 				if(!sett.isUpdateDB()){
@@ -447,7 +458,7 @@ public class ProjectGUI {
 		settingsDialog.add(btnSave, BorderLayout.PAGE_END);
 		
 		settingsDialog.pack();
-		settingsDialog.setVisible(true);		
+		settingsDialog.setVisible(true);	
 	}
 
 	/**
@@ -462,15 +473,12 @@ public class ProjectGUI {
     		switch(option) {
     		case 0:
     			portfolio.save(WORKING_FILE);
-    		case 1:
-    			System.exit(0);
     		default:
     			break;        	    		
     		}
     		System.out.print("unsaved changes " + option);
-    	} else {
-    		System.exit(0);
     	}
+		frame.dispose();
 	}
 	
 	/**
@@ -544,7 +552,7 @@ public class ProjectGUI {
 	 * @see OngoingProject
 	 * @see FinishedProject
 	 */
-	private static class NewProjectDialog extends JFrame {
+	private static class NewProjectDialog extends JDialog {
 		
 		private static final long serialVersionUID = 1L;
 		
@@ -582,11 +590,11 @@ public class ProjectGUI {
 		 */
 		public NewProjectDialog(String pt) {
 			
-			super("Add new project");
+			super(frame, "Add new project");
 			resetFields();
 			pType = pt;
 			
-			final JFrame npd = this;
+			final JDialog npd = this;
 			
 			pSDate.setHorizontalAlignment(SwingConstants.RIGHT);
 			pDeadline.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -604,6 +612,9 @@ public class ProjectGUI {
 			getContentPane().setLayout(new BorderLayout());
 			
 			final JPanel fieldPanel = new JPanel();
+			
+			pCode.setText(portfolio.getNewCode());
+			pCode.setEditable(false);
 			
 			if(pType.equals("o")) {
 				fieldPanel.setLayout(new GridLayout(7,3));
@@ -762,10 +773,11 @@ public class ProjectGUI {
 		 */
 		private static Boolean validateForm() {
 			Boolean valid = true;
+			System.out.println("Index: "+portfolio.findByCode(pCode.getText()));
 			if(pCode.getText().equals("")) {
 				msgCode.setText("Project code is required");
 				valid = false;
-			} else if(portfolio.findByCode(pCode.getText()) != -1) {
+			} else if(portfolio.findByCode(pCode.getText()) >= 0) {
 				msgCode.setText("Project already exists!");
 				valid = false;
 			} else {
