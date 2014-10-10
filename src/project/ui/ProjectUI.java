@@ -24,7 +24,8 @@ import project.logic.Settings;
  * ProjectUI is the text based interface that drives the Project Management application.
  * It uses a Portfolio object to interact with the stored data and modify it.
  * @author Gabriel Skoropada
- * @version	2.1 - Changed main() to start() on 16/sep/14
+ * @version	3.0
+ * @see ProjectAbstractUI
  * @see ProjectGUI
  * @see Portfolio
  * @see Project
@@ -32,7 +33,7 @@ import project.logic.Settings;
  * @see FinishedProject
  * 
  */
-public class ProjectUI extends ProjectAbstractUI {
+public class ProjectUI implements ProjectAbstractUI {
 	
 	/** Scanner object used to get input from the user */
 	private static Scanner input = new Scanner(System.in);
@@ -71,6 +72,12 @@ public class ProjectUI extends ProjectAbstractUI {
 	/** A String representing the name of the default dataset file */
 	private static final String DEFAULTS_FILE = "defaults.obj";
 
+	/**
+	 * Starts the text based interface.
+	 * @param s A Settings object.
+	 * @return true if the user chose to exit the application; false if there has been a change in
+	 * the settings.
+	 */
 	@Override
 	public boolean start(Settings s) {
 		
@@ -264,20 +271,8 @@ public class ProjectUI extends ProjectAbstractUI {
 		}		
 		
 		String in;
-		boolean exists;
 		newProject.setCode(portfolio.getNewCode());
 		System.out.println("Project Code: "+newProject.getCode());
-		/*do {
-			System.out.println("Project Code: "+portfolio.getNewCode());
-			in = input.nextLine();
-			exists = false;
-			if(portfolio.findByCode(in) == -1) { 
-				newProject.setCode(in.toUpperCase());
-			} else {
-				exists = true;
-				System.out.println("** Project already exists **");
-			}
-		} while (exists);*/
 		
 			System.out.print("Project Name: ");
 			in = input.nextLine();
@@ -851,7 +846,7 @@ public class ProjectUI extends ProjectAbstractUI {
 			code = input.nextLine();
 			if (!code.toUpperCase().equals("Q")) {
 				index = portfolio.findByCode(code);
-				if (index >= 0) {
+				if (index < 0) {
 					System.out.println("** Invalid Project Code **");
 					index = -1;
 				}

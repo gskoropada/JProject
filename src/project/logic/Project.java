@@ -89,6 +89,11 @@ abstract public class Project implements Serializable, Comparable<Project> {
 		client = Cl;
 	}
 	
+	/**
+	 * Compares this object to another Project object based on the Project Code.
+	 * @param p 	The Project object to which this will be compared
+	 * @return	a negative integer, zero, or a positive integer as this object is less than, equal to, or greater than the specified object
+	 */
 	@Override
 	public int compareTo(Project p) {
 		

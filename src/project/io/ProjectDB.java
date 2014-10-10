@@ -52,6 +52,9 @@ public class ProjectDB {
 		}
 	}
 	
+	/**
+	 * Closes the working database connection.
+	 */
 	public static void close() {
 		try {
 			con.close();
@@ -187,7 +190,7 @@ public class ProjectDB {
 	}
 
 	/**
-	 * Deletes a Prroject record from the database.
+	 * Deletes a Project record from the database.
 	 * @param project The Project object to be deleted.
 	 */
 	public static void delete(Project project) {

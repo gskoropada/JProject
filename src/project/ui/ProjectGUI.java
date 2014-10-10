@@ -57,7 +57,8 @@ import project.logic.*;
  * data set, restore to the default data set and exiting the application.<br>
  * When adding a new project the application prompts for the data using a NewProjectDialog object
  * @author Gabriel Skoropada
- * @version 1.1 - Changed main() to start(); user settings on 16/sep/14
+ * @version 2.0
+ * @see ProjectAbstractUI
  * @see ProjectUI
  * @see Portfolio
  * @see Selection
@@ -66,7 +67,7 @@ import project.logic.*;
  * @see FinishedProject
  * @see Settings
  */
-public class ProjectGUI extends ProjectAbstractUI {
+public class ProjectGUI implements ProjectAbstractUI {
 
 	private static final String VERSION = "3.0";
 	/** true if there are no unsaved changes, false if changes had been made and not saved */
@@ -95,9 +96,15 @@ public class ProjectGUI extends ProjectAbstractUI {
    	private static JLabel ongoingProjectsLabel;
    	/** JLabel object to display the FinishedProject count */
 	private static JLabel finishedProjectsLabel;
-	
+	/** boolean flag indicating if user chose to exit the application or if has changed settings. */
 	private static boolean exit = true;
-		
+	
+	/**
+	 * Starts the graphical user interface.
+	 * @param s A Settings object.
+	 * @return true if the user chose to exit the application; false if there has been a change in
+	 * the settings.
+	 */
 	public boolean start (Settings s) {
 		exit = true;
 		config = s;
@@ -106,28 +113,24 @@ public class ProjectGUI extends ProjectAbstractUI {
 		DEFAULTS_FILE = s.getDefaultsFile();
 		DATE_FORMAT = s.getDefaultDateFormat();
 		
-		System.out.println("Settings assigned");
 		if(s.isUpdateDB()) {
-			System.out.println("Update DB");
 			portfolio.initDB();
 		} else {
-			System.out.println("Open File");
 			portfolio.init(WORKING_FILE);
 		}
-			
-		System.out.println("Init selection");
+
 		sel.init(portfolio);
 		
 		dateFormat = new SimpleDateFormat(DATE_FORMAT);
 		
-		System.out.println("Show splash");
 		splashScreen();
-		System.out.println("Show main window");
 		return mainWindow();
 	}
 	
 	/**
-	 * Displays the main application windows.
+	 * Displays the main application window.
+	 * @return true if the user chose to exit the application; false if there has been a change in
+	 * the settings.
 	 */
 	public static boolean mainWindow() {
 		
@@ -512,7 +515,6 @@ public class ProjectGUI extends ProjectAbstractUI {
 	 * @return false if the user cancels the action.
 	 */
 	private static boolean addNewProject() {
-		System.out.println("Add new project");
 		String[] options = new String[] {"Ongoing","Finished","Cancel"};
 		int choice = JOptionPane.showOptionDialog(frame, "Select new project type" , "Add new Project", 
 				JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[2]);

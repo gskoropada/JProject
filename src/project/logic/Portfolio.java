@@ -36,7 +36,7 @@ public class Portfolio {
 	 * @param file	String containing the name of the file to use for initialization
 	 */
 	public void init(String file) {
-		
+		portfolio=null;
 		try {
 			portfolio = ProjectIO.open(file);
 			System.out.println("** File read successful **\n");
@@ -50,6 +50,7 @@ public class Portfolio {
 	* ArrayList&#60;Project&#62;
 	* @param projects	ArrayList&#60;Project&#62; object containing the data */
 	public void init(ArrayList<Project> projects) {
+		portfolio = null;
 		portfolio = projects;
 		Collections.sort(portfolio);
 	}
@@ -60,6 +61,7 @@ public class Portfolio {
 	public void initDB() {
 		ProjectDB.connect();
 		
+		portfolio = null;
 		portfolio = ProjectDB.init();
 	
 		Collections.sort(portfolio);
@@ -141,23 +143,16 @@ public class Portfolio {
 		
 	}
 	/** Returns the index of a specific Project object with a given Code within the 
-	* working ArrayList&#60;Project&#62;. Returns -1 if the Code is not found
+	* working ArrayList&#60;Project&#62;. Returns a negative Integer if the Code is not found
 	* @param c	String representing the required project code
 	* @return	Returns the index of a specific Project object with a given Code within the 
-	* working ArrayList&#60;Project&#62;. Returns -1 if the Code is not found */
+	* working ArrayList&#60;Project&#62;. Returns a negative Integer if the Code is not found */
 	public int findByCode (String c) {
 		
 		Project p = new OngoingProject();
 		p.setCode(c);	
 		
 		int index = Collections.binarySearch(portfolio,p);
-		
-		/*for (int i=0; i<portfolio.size(); i++) {
-			if (portfolio.get(i).getCode().equalsIgnoreCase(c)) {
-				index = i;
-				break;
-			}
-		}*/
 		
 		return index;
 	}
@@ -325,10 +320,17 @@ public class Portfolio {
 		
 	}
 	
+	/**
+	 * Closes the database connection.
+	 */
 	public void close() {
 		ProjectDB.close();
 	}
 	
+	/**
+	 * Returns a new Project Code based on the last project code on the ArrayList in the format "P####"
+	 * @return A String representing the new project code.
+	 */
 	public String getNewCode() {
 		String lastCode = portfolio.get(portfolio.size()-1).getCode();
 		

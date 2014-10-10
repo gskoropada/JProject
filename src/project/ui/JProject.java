@@ -23,18 +23,13 @@ public class JProject {
 			parseArgs(args);
 			args=new String[0];
 			if(s.isGUI()) {
-				System.out.println("Use GUI");
 				UI = new ProjectGUI();
 				exit = UI.start(s);
 			} else {
-				System.out.println("Use Text UI");
 				UI = new ProjectUI();
 				exit = UI.start(s);
 			}
-			System.out.println("Returned: "+exit);
 		} while(!exit);
-		
-		System.out.println("Exit application");
 	}
 
 	/**
