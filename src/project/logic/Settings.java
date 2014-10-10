@@ -33,7 +33,17 @@ public class Settings implements Serializable {
 		defaultsFile = "defaults.obj";
 		updateDB = true;
 	}
-	
+	/**
+	 * Creates a new settings object with the data from another Settings object.
+	 * @param s A Settings object that will be used to initialise the new one.
+	 */
+	public Settings(Settings s) {
+		defaultDateFormat = s.getDefaultDateFormat();
+		GUI = s.isGUI();
+		workingFile = s.getWorkingFile();
+		defaultsFile = s.getDefaultsFile();
+		updateDB = s.isUpdateDB();
+	}
 	
 	/** @return a String representing the default date format for the application */
 	public String getDefaultDateFormat() {

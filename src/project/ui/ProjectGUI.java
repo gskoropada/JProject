@@ -99,6 +99,8 @@ public class ProjectGUI implements ProjectAbstractUI {
 	/** boolean flag indicating if user chose to exit the application or if has changed settings. */
 	private static boolean exit = true;
 	
+	private static final JButton btnRestore = new JButton("Restore");
+	
 	/**
 	 * Starts the graphical user interface.
 	 * @param s A Settings object.
@@ -266,12 +268,27 @@ public class ProjectGUI implements ProjectAbstractUI {
         		/* Saves the current working Portfolio state to the working file */
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					toggleSaved(portfolio.save(WORKING_FILE));
+					if(config.isUpdateDB()) {
+						int option = JOptionPane.showOptionDialog(frame,
+			    				"This action will overwrite your locally stored\ndata with the data from the database\n"
+			    				+ "Do you wish to proceed?",
+			    				"Saving from Database",JOptionPane.YES_NO_OPTION,
+			    				JOptionPane.WARNING_MESSAGE, null, null, 0);
+			    		switch(option) {
+			    		case 0:
+			    			portfolio.save(WORKING_FILE);
+			    		default:
+			    			break;        	    		
+			    		}
+					} else {
+						toggleSaved(portfolio.save(WORKING_FILE));
+					}
 				}
-        		
         	});
         	
-        	JButton btnRestore = new JButton("Restore");
+        	if(config.isUpdateDB()) {
+        		btnRestore.setEnabled(false);
+        	}
         	btnRestore.addActionListener(new ActionListener() {
         		/* Initializes the working portfolio with data from the default dataset file */
 				@Override
@@ -431,23 +448,40 @@ public class ProjectGUI implements ProjectAbstractUI {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				
+				if(!saved) {
+		    		int option = JOptionPane.showOptionDialog(frame,
+		    				"Updating the settings will reset the application\nThere are unsaved changes\nDo you want to save them now?",
+		    				"Unsaved changes",JOptionPane.YES_NO_CANCEL_OPTION,
+		    				JOptionPane.WARNING_MESSAGE, null, null, 0);
+		    		switch(option) {
+		    		case 0:
+		    			toggleSaved(portfolio.save(WORKING_FILE));
+		    		default:
+		    			break;        	    		
+		    		}
+				}
+				
 				sett.setWorkingFile(tfFile.getText());
 				
 				sett.save();
-				config = sett;
+				config = new Settings(sett);
 				settingsDialog.dispose();
 				
 				if(!sett.isGUI()){
 					frame.dispose();
 					exit = false;
+					return;
 				}
 				
 				if(!sett.isUpdateDB()){
 					portfolio.init(config.getWorkingFile());
 					frame.setTitle("JProject v."+VERSION);
+					btnRestore.setEnabled(true);
 				} else {
+					
 					portfolio.initDB();
 					frame.setTitle("JProject v."+VERSION+" ** Linked to Database **");
+					btnRestore.setEnabled(false);
 				}
 					opTable.setModel((TableModel) new ProjectTableModel(portfolio.getOngoingProjects()));
 					fpTable.setModel((TableModel) new ProjectTableModel(portfolio.getFinishedProjects()));
@@ -476,12 +510,16 @@ public class ProjectGUI implements ProjectAbstractUI {
     		switch(option) {
     		case 0:
     			portfolio.save(WORKING_FILE);
+    		case 1:
+    			frame.dispose();
     		default:
     			break;        	    		
     		}
-    		System.out.print("unsaved changes " + option);
+    		System.out.println("unsaved changes " + option);
+    	} else {
+    		frame.dispose();
     	}
-		frame.dispose();
+		
 	}
 	
 	/**
