@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -31,6 +32,40 @@ public class PortfolioTest {
 			e.printStackTrace();
 		}
 		port.init(testData);
+		port.save("testPortfolioFile.obj");
+	}
+	
+	@Test
+	public void testPortfolioGetOngoingProjects() {
+		port.init(testData);
+		Collections.sort(testData);
+		ArrayList<Project> ongoing = port.getOngoingProjects();
+		assertEquals(testData.get(1), ongoing.get(0));
+		assertEquals(testData.get(4), ongoing.get(1));
+	}
+	
+	@Test
+	public void testPortfolioGetFinishedProjects() {
+		port.init(testData);
+		Collections.sort(testData);
+		ArrayList<Project> finished = port.getFinishedProjects();
+		assertEquals(testData.get(0), finished.get(0));
+		assertEquals(testData.get(2), finished.get(1));
+		assertEquals(testData.get(3), finished.get(2));
+	}
+	
+	@Test
+	public void testPortfolioInit() {
+		port.init(testData);
+		Collections.sort(testData);
+		assertEquals(testData, port.getPortfolio());
+	}
+	
+	@Test
+	public void testPortfolioFindByCodeExcluding() {
+		int index = port.findByCode("P0002");
+		assertTrue(port.findByCode("P0002", index)==-1);
+		assertTrue(port.findByCode("P0002",index+1)>0);
 	}
 	
 	@Test
@@ -53,13 +88,30 @@ public class PortfolioTest {
 	}
 	
 	@Test
-	public void testPortfolioGetNewCode() {
-		assertEquals("P0006",port.getNewCode());
+	public void testPortfolioAddRemove() {
+		fp.setCode(port.getNewCode());
+		port.add(fp, false);
+		op.setCode(port.getNewCode());
+		port.add(op, false);
+		
+		int index1 = port.findByCode(fp.getCode());
+		int index2 = port.findByCode(op.getCode());
+		
+		assertTrue(index1>0);
+		assertTrue(index2>0);
+		
+		port.remove(index2, false);
+		port.remove(index1, false);
+		
+		assertTrue(port.findByCode(fp.getCode())<0);
+		assertTrue(port.findByCode(op.getCode())<0);
+		
+		
 	}
 	
 	@Test
 	public void testPortfolioSave() {
-		assertTrue(port.save("testPortfolioFile.obj"));
+		assertTrue(port.save("testPortfolioFileSave.obj"));
 	}
 	
 	@Test
@@ -70,6 +122,11 @@ public class PortfolioTest {
 		assertFalse(originalProject.equals(port.get(1)));
 		assertTrue(fp.equals(port.get(1)));
 		
+		port.replaceProject(op, 1, false);
+		
+		assertFalse(fp.equals(port.get(1)));
+		assertTrue(op.equals(port.get(1)));
+		
 		port.replaceProject(originalProject, 1, false);
 	}
 	
@@ -79,4 +136,35 @@ public class PortfolioTest {
 		assertEquals(3, port.getFinishedCount());
 	}
 	
+	
+	@Test
+	@SuppressWarnings("unused")
+	public void testPortfolioIndexOutOfBounds() {
+		try {
+			Project p1 = port.get(-1);
+		} catch (Exception e) {
+			assertTrue(e instanceof IndexOutOfBoundsException);
+		}
+		try {
+			Project p2 = port.get(50);
+		} catch (Exception e) {
+			assertTrue(e instanceof IndexOutOfBoundsException);
+		}
+		
+	}
+	
+	@Test
+	public void testPortfolioInitFile() {
+		port.init("testPortfolioFile.obj");
+		Collections.sort(testData);
+		ArrayList<Project> port_from_file = port.getPortfolio();
+		for(int i=0;i<testData.size(); i++) {
+			assertTrue(testData.get(i).equals(port_from_file.get(i)));
+		}
+	}
+	
+	@Test
+	public void testPortfolioListProjects() {
+		port.listProjects();
+	}
 }

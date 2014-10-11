@@ -25,6 +25,8 @@ public class FinishedProject extends Project {
 	 */
 	public FinishedProject() {
 		super();
+		endDate = new Date();
+		totalCost = 0;
 	}
 	
 	/**

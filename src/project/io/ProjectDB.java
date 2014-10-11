@@ -85,7 +85,6 @@ public class ProjectDB {
 				port.add(op);
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -101,7 +100,6 @@ public class ProjectDB {
 				port.add(fp);
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -182,7 +180,6 @@ public class ProjectDB {
 			sql.executeUpdate(query);
 			System.out.println("** Record Updated **");
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			System.out.println("** Could not update record **");
 			e.printStackTrace();
 		}

@@ -30,7 +30,7 @@ public class OngoingProject extends Project {
 	 */
 	public OngoingProject() {
 		super();
-		deadline=null;
+		deadline=new Date();
 		budget=0;
 		completion=0;
 	}

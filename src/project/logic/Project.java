@@ -38,9 +38,9 @@ abstract public class Project implements Serializable, Comparable<Project> {
 	 */
 	public Project() {
 		projectCode = "P0000";
-		projectName = null;
-		startDate = null;
-		client = null;
+		projectName = "";
+		startDate = new Date();
+		client = "";
 	}
 	/**
 	 * Creates a Project object with the data passed in the parameters.

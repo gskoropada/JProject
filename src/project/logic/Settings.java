@@ -98,7 +98,7 @@ public class Settings implements Serializable {
 			ProjectIO.saveSettings(this);
 			saved = true;
 		} catch(IOException e) {
-			
+			System.out.println("** Could not save settings **");
 		}
 		
 		return saved;
